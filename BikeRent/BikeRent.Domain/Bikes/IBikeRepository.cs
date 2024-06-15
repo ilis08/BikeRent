@@ -1,7 +1,6 @@
-﻿namespace BikeRent.Domain.Bikes
+﻿namespace BikeRent.Domain.Bikes;
+
+public interface IBikeRepository
 {
-    public interface IBikeRepository
-    {
-        Task<Bike?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    }
+    Task<Bike?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

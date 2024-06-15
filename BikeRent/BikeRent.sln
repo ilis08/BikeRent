@@ -7,7 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4EDA1055-DF8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{44E1082F-FEFC-4D7F-8887-37B5B60EB7B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeRent.Domain", "BikeRent.Domain\BikeRent.Domain.csproj", "{FA8F073A-56FC-40A7-896F-F885D2A5CB77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BikeRent.Domain", "BikeRent.Domain\BikeRent.Domain.csproj", "{FA8F073A-56FC-40A7-896F-F885D2A5CB77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeRent.Application", "BikeRent.Application\BikeRent.Application.csproj", "{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,12 +21,17 @@ Global
 		{FA8F073A-56FC-40A7-896F-F885D2A5CB77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA8F073A-56FC-40A7-896F-F885D2A5CB77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA8F073A-56FC-40A7-896F-F885D2A5CB77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FA8F073A-56FC-40A7-896F-F885D2A5CB77} = {4EDA1055-DF84-4EAE-9DC6-980383BD07A2}
+		{F6A38979-0FF7-4F7E-9A2B-1B6B0BCF496B} = {4EDA1055-DF84-4EAE-9DC6-980383BD07A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5F05868A-581C-423E-A1C5-3411608B73F6}

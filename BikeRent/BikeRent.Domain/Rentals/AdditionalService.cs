@@ -1,9 +1,8 @@
-﻿namespace BikeRent.Domain.Rentals
+﻿namespace BikeRent.Domain.Rentals;
+
+public enum AdditionalService
 {
-    public enum AdditionalService
-    {
-        ProtectiveEquipment,
-        BikeAccessories,
-        DeliveryAndPickup,
-    }
+    ProtectiveEquipment,
+    BikeAccessories,
+    DeliveryAndPickup,
 }

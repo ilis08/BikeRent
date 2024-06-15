@@ -3,154 +3,153 @@ using BikeRent.Domain.Bikes;
 using BikeRent.Domain.Rentals.Events;
 using BikeRent.Domain.Shared;
 
-namespace BikeRent.Domain.Rentals
+namespace BikeRent.Domain.Rentals;
+
+public sealed class Rental : Entity
 {
-    public sealed class Rental : Entity
+    private Rental(
+        Guid id,
+        Guid bikeId,
+        Guid userId,
+        DateRange duration,
+        Money priceForPeriod,
+        Money insuranceFee,
+        Money additionalServicesUpCharge,
+        Money totalPrice,
+        RentalStatus rentalStatus,
+        DateTime createdOnUtc)
+        : base(id)
     {
-        private Rental(
-            Guid id,
-            Guid bikeId,
-            Guid userId,
-            DateRange duration,
-            Money priceForPeriod,
-            Money insuranceFee,
-            Money additionalServicesUpCharge,
-            Money totalPrice,
-            RentalStatus rentalStatus,
-            DateTime createdOnUtc)
-            : base(id)
+        BikeId = bikeId;
+        UserId = userId;
+        Duration = duration;
+        PriceForPeriod = priceForPeriod;
+        InsuranceFee = insuranceFee;
+        AdditionalServicesUpCharge = additionalServicesUpCharge;
+        TotalPrice = totalPrice;
+        RentalStatus = rentalStatus;
+        CreatedOnUtc = createdOnUtc;
+    }
+
+    public Guid BikeId { get; private set; }
+
+    public Guid UserId { get; private set; }
+
+    public ICollection<AdditionalService> AdditionalServices { get; private set; } = [];
+
+    public DateRange Duration { get; private set; }
+
+    public Money PriceForPeriod { get; private set; }
+
+    public Money InsuranceFee { get; private set; }
+
+    public Money AdditionalServicesUpCharge { get; private set; }
+
+    public Money TotalPrice { get; private set; }
+
+    public RentalStatus RentalStatus { get; private set; }
+
+    public DateTime CreatedOnUtc { get; private set; }
+
+    public DateTime? ConfirmedOnUtc { get; private set; }
+
+    public DateTime? RejectedOnUtc { get; private set; }
+
+    public DateTime? CompletedOnUtc { get; private set; }
+
+    public DateTime? CancelledOnUtc { get; private set; }
+
+    public static Rental Reserve(
+        Bike bike,
+        Guid userId,
+        DateRange duration,
+        List<AdditionalService> additionalServices,
+        DateTime utcNow,
+        PricingService pricingService)
+    {
+        var pricingDetails = pricingService.CalculatePrice(bike, duration, additionalServices);
+
+        var rental = new Rental(
+            Guid.NewGuid(),
+            bike.Id,
+            userId,
+            duration,
+            pricingDetails.PriceForPeriod,
+            pricingDetails.InsuranceFee,
+            pricingDetails.AdditionalServicesUpCharge,
+            pricingDetails.TotalPrice,
+            RentalStatus.Reserved,
+            utcNow);
+
+        rental.RaiseDomainEvent(new BikeReservedDomainEvent(rental.Id));
+
+        bike.LastRentedOnUtc = utcNow;
+
+        return rental;
+    }
+
+    public Result Confirm(DateTime utcNow)
+    {
+        if (RentalStatus != RentalStatus.Reserved)
         {
-            BikeId = bikeId;
-            UserId = userId;
-            Duration = duration;
-            PriceForPeriod = priceForPeriod;
-            InsuranceFee = insuranceFee;
-            AdditionalServicesUpCharge = additionalServicesUpCharge;
-            TotalPrice = totalPrice;
-            RentalStatus = rentalStatus;
-            CreatedOnUtc = createdOnUtc;
+            return Result.Failure(RentalErrors.NotReserved);
         }
 
-        public Guid BikeId { get; private set; }
+        RentalStatus = RentalStatus.Confirmed;
+        ConfirmedOnUtc = utcNow;
 
-        public Guid UserId { get; private set; }
+        RaiseDomainEvent(new RentalConfirmedDomainEvent(Id));
 
-        public ICollection<AdditionalService> AdditionalServices { get; private set; } = [];
+        return Result.Success();
+    }
 
-        public DateRange Duration { get; private set; }
-
-        public Money PriceForPeriod { get; private set; }
-
-        public Money InsuranceFee { get; private set; }
-
-        public Money AdditionalServicesUpCharge { get; private set; }
-
-        public Money TotalPrice { get; private set; }
-
-        public RentalStatus RentalStatus { get; private set; }
-
-        public DateTime CreatedOnUtc { get; private set; }
-
-        public DateTime? ConfirmedOnUtc { get; private set; }
-
-        public DateTime? RejectedOnUtc { get; private set; }
-
-        public DateTime? CompletedOnUtc { get; private set; }
-
-        public DateTime? CancelledOnUtc { get; private set; }
-
-        public static Rental Reserve(
-            Bike bike,
-            Guid userId,
-            DateRange duration,
-            List<AdditionalService> additionalServices,
-            DateTime utcNow,
-            PricingService pricingService)
+    public Result Reject(DateTime utcNow)
+    {
+        if (RentalStatus != RentalStatus.Reserved)
         {
-            var pricingDetails = pricingService.CalculatePrice(bike, duration, additionalServices);
-
-            var rental = new Rental(
-                Guid.NewGuid(),
-                bike.Id,
-                userId,
-                duration,
-                pricingDetails.PriceForPeriod,
-                pricingDetails.InsuranceFee,
-                pricingDetails.AdditionalServicesUpCharge,
-                pricingDetails.TotalPrice,
-                RentalStatus.Reserved,
-                utcNow);
-
-            rental.RaiseDomainEvent(new BikeReservedDomainEvent(rental.Id));
-
-            bike.LastRentedOnUtc = utcNow;
-
-            return rental;
+            return Result.Failure(RentalErrors.NotReserved);
         }
 
-        public Result Confirm(DateTime utcNow)
+        RentalStatus = RentalStatus.Rejected;
+        RejectedOnUtc = utcNow;
+
+        RaiseDomainEvent(new RentalRejectedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result Complete(DateTime utcNow)
+    {
+        if (RentalStatus != RentalStatus.Confirmed)
         {
-            if (RentalStatus != RentalStatus.Reserved)
-            {
-                return Result.Failure(RentalErrors.NotReserved);
-            }
-
-            RentalStatus = RentalStatus.Confirmed;
-            ConfirmedOnUtc = utcNow;
-
-            RaiseDomainEvent(new RentalConfirmedDomainEvent(Id));
-
-            return Result.Success();
+            return Result.Failure(RentalErrors.NotConfirmed);
         }
 
-        public Result Reject(DateTime utcNow)
+        RentalStatus = RentalStatus.Completed;
+        CompletedOnUtc = utcNow;
+
+        RaiseDomainEvent(new RentalCompletedDomainEvent(Id));
+
+        return Result.Success();
+    }
+
+    public Result Cancel(DateTime utcNow)
+    {
+        if (RentalStatus != RentalStatus.Confirmed)
         {
-            if (RentalStatus != RentalStatus.Reserved)
-            {
-                return Result.Failure(RentalErrors.NotReserved);
-            }
-
-            RentalStatus = RentalStatus.Rejected;
-            RejectedOnUtc = utcNow;
-
-            RaiseDomainEvent(new RentalRejectedDomainEvent(Id));
-
-            return Result.Success();
+            return Result.Failure(RentalErrors.NotConfirmed);
         }
 
-        public Result Complete(DateTime utcNow)
+        if (utcNow > Duration.Start)
         {
-            if (RentalStatus != RentalStatus.Confirmed)
-            {
-                return Result.Failure(RentalErrors.NotConfirmed);
-            }
-
-            RentalStatus = RentalStatus.Completed;
-            CompletedOnUtc = utcNow;
-
-            RaiseDomainEvent(new RentalCompletedDomainEvent(Id));
-
-            return Result.Success();
+            return Result.Failure(RentalErrors.RentInProgress);
         }
 
-        public Result Cancel(DateTime utcNow)
-        {
-            if (RentalStatus != RentalStatus.Confirmed)
-            {
-                return Result.Failure(RentalErrors.NotConfirmed);
-            }
+        RentalStatus = RentalStatus.Cancelled;
+        CancelledOnUtc = utcNow;
 
-            if (utcNow > Duration.Start)
-            {
-                return Result.Failure(RentalErrors.RentInProgress);
-            }
+        RaiseDomainEvent(new RentalCancelledDomainEvent(Id));
 
-            RentalStatus = RentalStatus.Cancelled;
-            CancelledOnUtc = utcNow;
-
-            RaiseDomainEvent(new RentalCancelledDomainEvent(Id));
-
-            return Result.Success();
-        }
+        return Result.Success();
     }
 }
