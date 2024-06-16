@@ -22,7 +22,7 @@ namespace BikeRent.Infrastructure.Configurations
 
             builder.Property(x => x.Email)
                 .HasMaxLength(320)
-                .HasConversion(description => description.Value, value => new Email(value));
+                .HasConversion(description => description.Value, value => new Domain.Users.Email(value));
 
             builder.HasIndex(x => x.Email)
                 .IsUnique();

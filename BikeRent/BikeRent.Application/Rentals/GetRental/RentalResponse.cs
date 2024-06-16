@@ -3,6 +3,7 @@
 public class RentalResponse
 {
     public Guid Id { get; set; }
+
     public Guid BikeId { get; init; }
 
     public Guid UserId { get; init; }

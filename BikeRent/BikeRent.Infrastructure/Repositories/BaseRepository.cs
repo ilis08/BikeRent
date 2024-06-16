@@ -19,9 +19,9 @@ namespace BikeRent.Infrastructure.Repositories
             return await dbContext.Set<T>().AsNoTracking().ToListAsync(cancellationToken);
         }
 
-        public Task<List<T?>> FindByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+        public async Task<List<T>> FindByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return await dbContext.Set<T>().AsNoTracking().Where(expression).ToListAsync(cancellationToken);
         }
 
         public async Task<T?> FindByIdAsync(string id, CancellationToken cancellationToken = default)

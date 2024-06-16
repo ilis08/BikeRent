@@ -35,12 +35,6 @@ namespace BikeRent.Infrastructure.Configurations
                             .HasConversion(currency => currency.Code, code => Currency.FromCode(code));
             });
 
-            builder.OwnsOne(x => x.InsuranceCost, insuranceCost =>
-            {
-                insuranceCost.Property(price => price.Currency)
-                            .HasConversion(currency => currency.Code, code => Currency.FromCode(code));
-            });
-
             builder.Property(x => x.LastRentedOnUtc)
                 .ValueGeneratedOnAddOrUpdate()
                 .IsConcurrencyToken();

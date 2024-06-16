@@ -1,7 +1,11 @@
-﻿using BikeRent.Domain.Abstractions;
+﻿using BikeRent.Application.Abstractions.Clock;
+using BikeRent.Application.Email;
+using BikeRent.Domain.Abstractions;
 using BikeRent.Domain.Bikes;
 using BikeRent.Domain.Rentals;
 using BikeRent.Domain.Users;
+using BikeRent.Infrastructure.Clock;
+using BikeRent.Infrastructure.Email;
 using BikeRent.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +15,7 @@ namespace BikeRent.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var assembly = typeof(DependencyInjection).Assembly;
 
@@ -22,6 +26,10 @@ public static class DependencyInjection
         {
             options.UseSqlite(dbConnectionString);
         });
+
+        services.AddTransient<IEmailService, EmailService>();
+
+        services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
         services.AddScoped<IBikeRepository, BikeRepository>();
 

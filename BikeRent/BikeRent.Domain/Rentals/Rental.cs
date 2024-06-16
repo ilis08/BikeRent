@@ -31,6 +31,10 @@ public sealed class Rental : Entity
         CreatedOnUtc = createdOnUtc;
     }
 
+    public Rental()
+    {
+    }
+
     public Guid BikeId { get; private set; }
 
     public Guid UserId { get; private set; }
