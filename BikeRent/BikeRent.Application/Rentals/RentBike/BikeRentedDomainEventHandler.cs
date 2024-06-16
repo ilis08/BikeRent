@@ -24,14 +24,14 @@ internal class BikeRentedDomainEventHandler : INotificationHandler<BikeReservedD
 
     public async Task Handle(BikeReservedDomainEvent notification, CancellationToken cancellationToken)
     {
-        var rental = await rentalRepository.GetByIdAsync(notification.RentalId);
+        var rental = await rentalRepository.FindByIdAsync(notification.RentalId.ToString(), cancellationToken);
 
         if (rental is null)
         {
             return;
         }
 
-        var user = await userRepository.GetByIdAsync(rental.UserId);
+        var user = await userRepository.FindByIdAsync(rental.UserId.ToString(), cancellationToken);
 
         if (user is null)
         {

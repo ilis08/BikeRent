@@ -1,4 +1,5 @@
 ﻿using BikeRent.Application.Abstractions.Messaging;
+using BikeRent.Application.Exceptions;
 using FluentValidation;
 using MediatR;
 

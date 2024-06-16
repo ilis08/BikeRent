@@ -1,8 +1,8 @@
-﻿namespace BikeRent.Domain.Users;
+﻿using BikeRent.Domain.Abstractions;
 
-public interface IUserRepository
+namespace BikeRent.Domain.Users;
+
+public interface IUserRepository : IAsyncRepository<User>
 {
-    Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
-    void Add(User user);
 }

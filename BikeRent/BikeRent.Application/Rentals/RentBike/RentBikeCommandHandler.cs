@@ -1,5 +1,6 @@
 ﻿using BikeRent.Application.Abstractions.Clock;
 using BikeRent.Application.Abstractions.Messaging;
+using BikeRent.Application.Exceptions;
 using BikeRent.Domain.Abstractions;
 using BikeRent.Domain.Bikes;
 using BikeRent.Domain.Rentals;
@@ -34,14 +35,14 @@ internal sealed class RentBikeCommandHandler : ICommandHandler<RentBikeCommand, 
 
     public async Task<Result<Guid>> Handle(RentBikeCommand request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetByIdAsync(request.UserId);
+        var user = await userRepository.FindByIdAsync(request.UserId.ToString(), cancellationToken);
 
         if (user is null)
         {
             return Result.Failure<Guid>(UserErrors.NotFound);
         }
 
-        var bike = await bikeRepository.GetByIdAsync(request.BikeId);
+        var bike = await bikeRepository.FindByIdAsync(request.BikeId.ToString(), cancellationToken);
 
         if (bike is null)
         {
@@ -55,18 +56,25 @@ internal sealed class RentBikeCommandHandler : ICommandHandler<RentBikeCommand, 
             return Result.Failure<Guid>(RentalErrors.Overlap);
         }
 
-        var rental = Rental.Reserve(
-            bike,
-            user.Id,
-            duration,
-            request.additionalServices,
-            utcNow: dateTimeProvider.UtcNow,
-            pricingService);
+        try
+        {
+            var rental = Rental.Reserve(
+                        bike,
+                        user.Id,
+                        duration,
+                        request.additionalServices,
+                        utcNow: dateTimeProvider.UtcNow,
+                        pricingService);
 
-        rentalRepository.Add(rental);
+            await rentalRepository.AddAsync(rental);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return rental.Id;
+            return rental.Id;
+        }
+        catch (ConcurrencyException)
+        {
+            return Result.Failure<Guid>(RentalErrors.Overlap);
+        }
     }
 }
