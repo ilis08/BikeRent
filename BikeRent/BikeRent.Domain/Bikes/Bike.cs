@@ -7,8 +7,8 @@ public sealed class Bike : Entity
 {
     public Bike(
         Guid id,
-        Name name,
-        Description description,
+        string name,
+        string description,
         Address address,
         Money bikeCost,
         Money pricePerSecond) : base(id)
@@ -24,9 +24,9 @@ public sealed class Bike : Entity
     {
     }
 
-    public Name Name { get; private set; }
+    public string Name { get; private set; }
 
-    public Description Description { get; private set; }
+    public string Description { get; private set; }
 
     public Address Address { get; private set; }
 

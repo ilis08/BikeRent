@@ -16,12 +16,12 @@ namespace BikeRent.Application.Bikes.SearchBikes
         public async Task<Result<List<BikeResponse>>> Handle(SearchBikesQuery request, CancellationToken cancellationToken)
         {
             var bikes = await bikeRepository
-                .FindByConditionAsync(x => x.Name.Value.Equals(request.Name), cancellationToken);
+                .FindByConditionAsync(x => x.Name.Contains(request.Name), cancellationToken);
 
             List<BikeResponse> response = bikes.Select(x => new BikeResponse
             {
-                Name = x.Name.Value,
-                Description = x.Description.Value,
+                Name = x.Name,
+                Description = x.Description,
                 Country = x.Address.Country,
                 State = x.Address.State,
                 ZipCode = x.Address.ZipCode,

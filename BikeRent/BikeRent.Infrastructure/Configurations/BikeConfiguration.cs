@@ -16,12 +16,10 @@ namespace BikeRent.Infrastructure.Configurations
             builder.OwnsOne(x => x.Address);
 
             builder.Property(x => x.Name)
-                .HasMaxLength(250)
-                .HasConversion(name => name.Value, value => new Name(value));
+                .HasMaxLength(250);
 
             builder.Property(x => x.Description)
-                .HasMaxLength(5000)
-                .HasConversion(description => description.Value, value => new Description(value));
+                .HasMaxLength(5000);
 
             builder.OwnsOne(x => x.BikeCost, bikeCost =>
             {
