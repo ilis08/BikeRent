@@ -26,7 +26,7 @@ namespace BikeRent.Infrastructure.Repositories
 
         public async Task<T?> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            return await dbContext.Set<T>().FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+            return await dbContext.Set<T>().FirstOrDefaultAsync(x => x.Id.Equals(Guid.Parse(id)), cancellationToken);
         }
 
         public async Task<T?> AddAsync(T entity, CancellationToken cancellationToken = default)

@@ -13,7 +13,7 @@ public class PricingService
 
         var pricePerPeriod = new Money(bike.PricePerSecond.Amount * durationInSeconds, currency);
 
-        var additionalServicesUpCharge = Money.Zero();
+        var additionalServicesUpCharge = Money.Zero(currency);
 
         foreach (var additionalService in additionalServices)
         {
@@ -22,13 +22,13 @@ public class PricingService
                 AdditionalService.ProtectiveEquipment => new Money(8, currency),
                 AdditionalService.BikeAccessories => new Money(5, currency),
                 AdditionalService.DeliveryAndPickup => new Money(4, currency),
-                _ => Money.Zero(),
+                _ => Money.Zero(currency),
             };
         }
 
-        var insuranceFee = new Money(bike.BikeCost.Amount * (5 / 100), currency);
+        var insuranceFee = new Money(bike.BikeCost.Amount * 0.05m, currency);
 
-        var totalPrice = Money.Zero();
+        var totalPrice = Money.Zero(currency);
 
         totalPrice += pricePerPeriod;
 
