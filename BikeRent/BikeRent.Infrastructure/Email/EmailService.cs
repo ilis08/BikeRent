@@ -6,7 +6,9 @@ namespace BikeRent.Infrastructure.Email
     {
         public Task SendAsync(string recipient, string subject, string body)
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"{recipient} {subject} {body}");
+
+            return Task.CompletedTask;
         }
     }
 }
