@@ -40,22 +40,27 @@ namespace BikeRent.Infrastructure
 
         private async Task PublishDomainEventsAsync()
         {
-            var domainEvents = ChangeTracker
+            var entities = ChangeTracker
                 .Entries<Entity>()
                 .Select(entry => entry.Entity)
-                .SelectMany(entity =>
-                {
-                    var domainEvents = entity.GetDomainEvents();
 
-                    entity.ClearDomainEvents();
-
-                    return domainEvents;
-                })
                 .ToList();
+
+            var domainEvents = entities.SelectMany(entity =>
+            {
+                var domainEvents = entity.GetDomainEvents();
+
+                return domainEvents;
+            }).ToList();
 
             foreach (var domainEvent in domainEvents)
             {
                 await publisher.Publish(domainEvent);
+            }
+
+            foreach (var entity in entities)
+            {
+                entity.ClearDomainEvents();
             }
         }
     }
